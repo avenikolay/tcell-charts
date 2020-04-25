@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Imports\ProductsImport;
-use App\Products;
+use App\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,28 +23,36 @@ class FileController extends Controller
 
         $collection = Excel::toCollection(new ProductsImport, $fileName);
         $result = $collection[0]->map(function ($item, $key) {
-            $date = $item['data_product'];
+            $date = $item['activation_date'];
             return $item->map(function ($i, $k) use ($date) {
-               if ($k !== 'data_product' && $k !== 'total') {
+               if ($k !== 'activation_date') {
                    return [
                        'name' => $k,
-                       'quantity' => $i,
-                       'date' => $date,
+                       'quantity' => ($i === null || $i === 0)  ? 0 : $i,
+                       'date' => Carbon::parse($date)->format('Y-m-d')
                    ];
                }
-            })->filter(function ($i, $k) {
-                return $k !== 'data_product' && $k !== 'total';
             })->filter(function ($i) {
                 return $i['date'] !== null && $i['quantity'] !== null;
             });
         })->flatten(1);
 
-        Products::insertOrIgnore($result->toArray());
+        Product::insertOrIgnore($result->toArray());
 //        $result = Excel::toArray(new ProductsImport, Storage::get($fileName));
         return response()->json($result);
     }
 
-    public function get() {
-        return response()->json(Products::all());
+    public function get(Request $request) {
+        return response()->json(Product::orderBy('date', 'desc')->paginate(100));
+    }
+
+    public function getDarkor() {
+        return response()->json(Product::where('name', 'like', 'darkor%')->orderBy('date', 'asc')->get());
+    }
+    public function getAlo() {
+        return response()->json(Product::where('name', 'like', 'alo%')->orderBy('date', 'asc')->get());
+    }
+    public function getSocials() {
+        return response()->json(Product::where('name', 'like', 'messendzery')->orWhere('name', 'like', 'socialnye_seti')->orWhere('name', 'like', 'youtube')->orderBy('date', 'asc')->get());
     }
 }

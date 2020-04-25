@@ -66,38 +66,69 @@
                         </template>
                     </tr>
                 </template>
-
             </table>
+            <pagination :data="products" :limit="2" @pagination-change-page="paginate($event)">
+                <span slot="prev-nav">&lt; Назад</span>
+                <span slot="next-nav">Вперед &gt;</span>
+            </pagination>
         </div>
 
 
     </div>
 </template>
 <script>
+    import pagination from 'laravel-vue-pagination';
     export default {
         props: ['flag'],
+        components: {
+            pagination
+        },
         data() {
             return {
                 loading: false,
-                products: []
+                products: {},
+                queryParams: this.getQueryParams()
             }
         },
         computed: {
             group() {
-                return this.products.reduce((accumulator, currentValue) => {
-                    const index = accumulator.findIndex(i => i.date === currentValue.date);
-                    if (index >= 0) {
-                        accumulator[index].data.push(currentValue)
-                        return accumulator
-                    }
-                    return [...accumulator, {date: currentValue.date, data: [currentValue]}]
-                }, [])
+                if (this.products.hasOwnProperty('data')) {
+                    return this.products.data.reduce((accumulator, currentValue) => {
+                        const index = accumulator.findIndex(i => i.date === currentValue.date);
+                        if (index >= 0) {
+                            accumulator[index].data.push(currentValue)
+                            return accumulator
+                        }
+                        return [...accumulator, {date: currentValue.date, data: [currentValue]}]
+                    }, [])
+                }
+                return []
             }
         },
         methods: {
+            paginate(page) {
+                console.log(this.queryParams)
+                this.queryParams = {...this.queryParams, page: page}
+                window.location.search = Object.entries(JSON.parse(JSON.stringify(this.queryParams))).map(i => {
+                    return i.join('=')
+                }).join('&')
+            },
+            getQueryParams() {
+                if (!window.location.search) { return {} }
+                return window.location.search.substring(1).split('&')
+                    .map(i => {
+                        const key = i.split('=')[0];
+                        const value = i.split('=')[1];
+                        return  { [key]: value }
+                    }).reduce((acc, current) => {
+                        return {...acc, ...current}
+                    }, {});
+            },
             loadData() {
                 this.loading = true
-                axios.get('/api/get')
+                axios.get('/api/get', {
+                    params: {...this.queryParams}
+                })
                     .then(
                         response => {
                             this.products = response.data

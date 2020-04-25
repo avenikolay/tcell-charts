@@ -2,7 +2,6 @@
     <div>
         <upload @uploaded="uploaded"></upload>
         <products :flag="flag"></products>
-        <!--<chart></chart>-->
     </div>
 </template>
 <script>

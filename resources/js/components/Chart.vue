@@ -1,46 +1,68 @@
 <template>
     <div class="card mt-5">
         <div class="card-body">
+            <h2 class="card-title">{{title}}</h2>
             <canvas ref="canvas"></canvas>
         </div>
     </div>
 </template>
 <script>
     import { Line } from 'vue-chartjs'
+    const colors = ['blue', 'yellow', 'pink', 'black', 'red',  'lime']
     export default {
-        data(){
-            return {
-                products: [
-                    {time: '1', nums: 2},
-                    {time: '2', nums: 3}
-                ]
+        props: ['innerData', 'title'],
+        extends: Line,
+        computed: {
+            days() {
+                return this.innerData.map(item => {
+                    return item.date
+                }).reduce((acc, currentValue) => {
+                    if (acc.includes(currentValue)) {
+                        return acc
+                    }
+                    return [...acc, currentValue]
+                }, [])
+            },
+            chartData() {
+                return this.innerData.reduce((acc, currentValue) => {
+                    const index = acc.findIndex(i => {
+                        return i.name === currentValue.name
+                    })
+
+                    if (index >= 0) {
+                        acc[index].actionsByDates = [...acc[index].actionsByDates, { date: currentValue.date, quantity: currentValue.quantity  }]
+                        return acc
+                    }
+                    return [...acc, { name: currentValue.name, actionsByDates: [ { date: currentValue.date, quantity: currentValue.quantity  } ] }]
+
+                }, []).map((item, idx) => {
+                    const color = `rgba(${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},${Math.floor(Math.random() * Math.floor(256))},1)`;
+                    return {
+                        label: item.name,
+                        fill: false,
+                        borderWidth: 2,
+                        backgroundColor: colors[idx],
+                        borderColor: colors[idx],
+                        data: item.actionsByDates.map(dt => {
+                            return dt.quantity
+                            // return Math.floor(Math.random() * Math.floor(11))
+                        })
+                    }
+                })
             }
         },
-        extends: Line,
         mounted () {
             this.renderChart(
                 {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
-                        fill: false,
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                {
-                    scales: {
-                        yAxes: [{
-                            stacked: false
-                        }]
+                    type: 'line',
+                    labels: this.days,
+                    datasets: this.chartData,
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'Chart.js Line Chart - Logarithmic'
+                        }
                     }
                 }
             )
