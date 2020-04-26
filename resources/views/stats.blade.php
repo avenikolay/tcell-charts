@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Tcell</title>
+    <title>Статистика</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -13,7 +13,7 @@
 </head>
 <body>
 <div id="app" class="container py-4">
-    <charts></charts>
+    <charts url="{{\Illuminate\Support\Facades\URL::to('/')}}"></charts>
 </div>
 <script src="{{ asset('js/app.js') }}"></script>
 </body>

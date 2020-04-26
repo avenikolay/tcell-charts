@@ -46,13 +46,35 @@ class FileController extends Controller
         return response()->json(Product::orderBy('date', 'desc')->paginate(100));
     }
 
-    public function getDarkor() {
-        return response()->json(Product::where('name', 'like', 'darkor%')->orderBy('date', 'asc')->get());
-    }
-    public function getAlo() {
-        return response()->json(Product::where('name', 'like', 'alo%')->orderBy('date', 'asc')->get());
-    }
-    public function getSocials() {
-        return response()->json(Product::where('name', 'like', 'messendzery')->orWhere('name', 'like', 'socialnye_seti')->orWhere('name', 'like', 'youtube')->orderBy('date', 'asc')->get());
+    public function getStats(Request $request) {
+            $group = $request->query('group');
+            $period = (((int) $request->query('period')) > 0) ? ((int) $request->query('period') - 1)  : 6;
+            $lastDate = Product::max('date');
+            $firstDate = Carbon::createFromFormat('Y-m-d', $lastDate)->subDays($period)->format('Y-m-d');
+            switch ($group) {
+                case 'darkor':
+                    $data = Product::where('name', 'like', 'darkor%')
+                        ->whereBetween('date', [$firstDate, $lastDate])
+                        ->orderBy('date', 'asc')->get();
+                    break;
+                case 'alo':
+                    $data = Product::where('name', 'like', 'alo%')
+                        ->whereBetween('date', [$firstDate, $lastDate])
+                        ->orderBy('date', 'asc')->get();
+                    break;
+                case 'socials':
+                    $data = Product::whereBetween('date', [$firstDate, $lastDate])
+                        ->where(function ($query) {
+                            $query->where('name', 'like', 'messendzery')
+                                ->orWhere('name', 'like', 'socialnye_seti')
+                                ->orWhere('name', 'like', 'youtube');
+                        })
+                        ->orderBy('date', 'asc')->get();
+                    break;
+                default:
+                    $data = [];
+            }
+
+        return response()->json($data);
     }
 }

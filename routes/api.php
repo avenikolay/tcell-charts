@@ -21,6 +21,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/upload', 'FileController@upload');
 Route::get('/get', 'FileController@get');
-Route::get('/getDarkor', 'FileController@getDarkor');
-Route::get('/getAlo', 'FileController@getAlo');
-Route::get('/getSocials', 'FileController@getSocials');
+Route::get('/getStats', 'FileController@getStats');
