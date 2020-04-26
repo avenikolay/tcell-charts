@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
-<div id="app" class="container py-4">
+<div id="app" class="container-fluid py-4">
     <charts url="{{\Illuminate\Support\Facades\URL::to('/')}}"></charts>
 </div>
 <script src="{{ asset('js/app.js') }}"></script>

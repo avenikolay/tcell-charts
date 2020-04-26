@@ -6,9 +6,20 @@
             <button type="button" class="btn btn-primary" :disabled="period === 7" @click="changePeriod(7)">7 дней</button>
             <button type="button" class="btn btn-primary" :disabled="period === 30" @click="changePeriod(30)">30 дней</button>
         </div>
-        <chart title="Тарифный план «Даркор»" :innerData="darkor" :colors="['#f7931e', '#0071bc', '#ed1c24', '#39b54a', '#754c24',  '#662d91']" />
-        <chart title="Тарифный план «Алло»" :innerData="alo" :colors="['#f7931e', '#0071bc', '#ed1c24', '#39b54a', '#754c24',  '#662d91']" />
-        <chart title="Социальные сети" :innerData="socials" :colors="['#39b54a', '#0071bc', '#ed1c24']" />
+        <div class="row">
+            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+                <chart title="Тарифный план «Даркор»" :innerData="darkor" :colors="['#f7931e', '#0071bc', '#ed1c24', '#39b54a', '#754c24',  '#662d91']" />
+            </div>
+            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+                <chart title="Тарифный план «Алло»" :innerData="alo" :colors="['#f7931e', '#0071bc', '#ed1c24', '#39b54a', '#754c24',  '#662d91']" />
+            </div>
+            <div class="col-12 col-xs-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+                <chart title="Социальные сети" :innerData="socials" :colors="['#39b54a', '#0071bc', '#ed1c24']" />
+            </div>
+        </div>
+
+
+
     </template>
 </div>
 </template>
